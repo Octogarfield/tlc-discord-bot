@@ -47,26 +47,6 @@ def get_json_data(url, query):
 
     return data
 
-def get_arbitrum_metrics_data():
-    query = """
-    query {
-        metrics(first: 1, orderBy: timestamp, orderDirection: desc) {
-        treasuryValueUSD,
-        timestamp,
-        }
-    } """
-
-    url = "https://api.thegraph.com/subgraphs/name/medariox/temple-metrics-arbitrum"
-    data = get_json_data(url, query)
-
-    metrics = data['data']['metrics'][0]
-
-    data_dict = {
-        'treasuryValue': float(metrics['treasuryValueUSD']),
-    }
-
-    return data_dict
-
 
 def get_mainnet_metrics_data():
     query = """query {
@@ -101,13 +81,12 @@ async def _refresh_price():
     logger.info("Refreshing price")
     try:
         mainnet_data = get_mainnet_metrics_data()
-        arbitrum_data = get_arbitrum_metrics_data()
     except Exception as err:
         logger.exception('Error refreshing price')
         nickname = 'ERROR'
     else:
         templeprice = mainnet_data['templePrice']
-        treasury_value = millify(mainnet_data['treasuryValue'] + arbitrum_data['treasuryValue'], 1)
+        treasury_value = millify(mainnet_data['treasuryValue'], 1)
 
         nickname = f'${templeprice} | ${treasury_value}'
     activity = f'TPI rise'

@@ -50,22 +50,20 @@ def get_json_data(url, query):
 
 def get_mainnet_metrics_data():
     query = """query {
-      metricDailySnapshots(first: 1, orderBy: timestamp, orderDirection: desc) {
-        templePrice
-        treasuryValueUSD
-        treasuryPriceIndex
+      templeLineOfCredits(first: 1, orderBy: timestamp, orderDirection: desc) {
+        interestRate
+        utilRatio
       }
     }"""
 
-    url = "https://api.thegraph.com/subgraphs/name/medariox/temple-metrics"
+    url = "https://api.thegraph.com/subgraphs/name/templedao/templedao-v2-mainnet"
     data = get_json_data(url, query)
 
-    metrics = data['data']['metricDailySnapshots'][0]
+    metrics = data['data']['templeLineOfCredits'][0]
 
     data_dict = {
-        'templePrice': roundf(metrics['templePrice'], 3),
-        'treasuryValue': float(metrics['treasuryValueUSD']),
-        'tpi': roundf(metrics['treasuryPriceIndex'], 3),
+        'interestRate': roundf(metrics['interestRate'], 3),
+        'utilRatio': roundf(metrics['utilRatio'], 3),
     }
 
     return data_dict
@@ -85,11 +83,11 @@ async def _refresh_price():
         logger.exception('Error refreshing price')
         nickname = 'ERROR'
     else:
-        templeprice = mainnet_data['templePrice']
-        treasury_value = millify(mainnet_data['treasuryValue'], 1)
+        interestRate = mainnet_data['interestRate']
+        utilRatio = millify(mainnet_data['utilRatio'], 1)
 
-        nickname = f'${templeprice} | ${treasury_value}'
-    activity = f'TPI rise'
+        nickname = f'${interestRate} | ${utilRatio}'
+    activity = f'TLC'
 
     logger.info("New stats {nickname} || {activity}", nickname=nickname, activity=activity)
 
